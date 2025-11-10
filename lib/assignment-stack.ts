@@ -71,10 +71,23 @@ export class AssignmentStack extends cdk.Stack {
             resources: [moviesTable.tableArn],
           }),
         });
+
+        const newMovieFn = new lambdanode.NodejsFunction(this, "AddMovieFn", {
+          architecture: lambda.Architecture.ARM_64,
+          runtime: lambda.Runtime.NODEJS_18_X,
+          entry: `${__dirname}/../lambdas/addMovie.ts`,
+          timeout: cdk.Duration.seconds(10),
+          memorySize: 128,
+          environment: {
+            TABLE_NAME: moviesTable.tableName,
+            REGION: cdk.Aws.REGION,
+          },
+        });
         
         // Permissions 
         moviesTable.grantReadData(getMovieByIdFn)
         moviesTable.grantReadData(getAllMoviesFn)
+        moviesTable.grantWriteData(newMovieFn)
 
         const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
@@ -93,6 +106,11 @@ export class AssignmentStack extends cdk.Stack {
     moviesEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getAllMoviesFn, { proxy: true })
+    );
+
+    moviesEndpoint.addMethod(
+      "POST",
+      new apig.LambdaIntegration(newMovieFn, { proxy: true })
     );
 
     const movieEndpoint = moviesEndpoint.addResource("{movieId}");
