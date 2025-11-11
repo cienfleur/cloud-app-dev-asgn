@@ -3,19 +3,22 @@ import {Movie, Actor, MovieCast, Award} from '../shared/types'
 
 export const movies : Movie[] = [
   {
-    id: 1000,
+    pk: "m1000",
+    sk: "xxxx",
     title: "The Shawshank Redemption",
     releaseDate: "1994-09-22",
     overview: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency."
   },
   {
-    id: 1001,
+    pk: "m1001",
+    sk: "xxxx",
     title: "The Godfather",
     releaseDate: "1972-03-24",
     overview: "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son."
   },
   {
-    id: 1002,
+    pk: "m1002",
+    sk: "xxxx",
     title: "The Dark Knight",
     releaseDate: "2008-07-18",
     overview: "When the menace known as the Joker emerges from his mysterious past, he wreaks havoc and chaos on the people of Gotham. The Dark Knight must accept one of the greatest psychological and physical tests of his ability to fight injustice."
@@ -24,55 +27,64 @@ export const movies : Movie[] = [
 
 export const actors : Actor[] = [
   {
-    id: 2000,
+    pk: "a2000",
+    sk: "xxxx",
     name: "Morgan Freeman",
     bio: "An American actor, director, and narrator known for his distinctive deep voice.",
     birthDate: "1937-06-01"
   },
   {
-    id: 2001,
+    pk: "a2001",
+    sk: "xxxx",
     name: "Tim Robbins",
     bio: "An American actor, screenwriter, director, producer, and musician.",
     birthDate: "1958-10-16"
   },
   {
-    id: 2002,
+    pk: "a2002",
+    sk: "xxxx",
     name: "Clancy Brown",
     bio: "An American actor and voice actor.",
     birthDate: "1959-01-05"
   },
   {
-    id: 2100,
+    pk: "a2100",
+    sk: "xxxx",
     name: "Marlon Brando",
     bio: "An American actor and film director who is widely regarded as one of the greatest and most influential actors of all time.",
     birthDate: "1924-04-03"
   },
   {
-    id: 2101,
+    pk: "a2101",
+    sk: "xxxx",
     name: "Al Pacino",
     bio: "An American actor and filmmaker known for his intense and charismatic performances.",
     birthDate: "1940-04-25"
   },
   {
-    id: 2102,
+    pk: "a2102",
+    sk: "xxxx",
     name: "James Caan",
     bio: "An American actor known for his roles in classic films.",
     birthDate: "1940-03-26"
   },
   {
-    id: 2200,
+    pk: "a2200",
+    sk: "xxxx",
     name: "Christian Bale",
     bio: "An English actor known for his versatility and intense method acting.",
     birthDate: "1974-01-30"
   },
   {
-    id: 2201,
+    pk: "a2201",
+    sk: "xxxx",
     name: "Heath Ledger",
     bio: "An Australian actor and music video director known for his diverse roles.",
     birthDate: "1979-04-04"
   },
   {
-    id: 2202,
+    pk: "a2202",
+    sk: "xxxx",
     name: "Michael Caine",
     bio: "An English actor known for his distinctive Cockney accent and versatile performances.",
     birthDate: "1933-03-14"
@@ -81,20 +93,20 @@ export const actors : Actor[] = [
 
 export const movieCasts: MovieCast[] = [
   {
-      movieId: 1000,
-      actorId: 2000,
+      pk: "c1000",
+      sk: "2000",
       roleName: "Ellis Boyd 'Red' Redding",
       roleDescription: "A long-term inmate who becomes the best friend of Andy Dufresne.",
     },
     {
-      movieId: 1001,
-      actorId: 2001,
+      pk: "c1001",
+      sk: "2001",
       roleName: "Vito Corleone",
       roleDescription: "The aging patriarch of the Corleone crime family.",
     },
     {
-      movieId: 1002,
-      actorId: 2002,
+      pk: "c1002",
+      sk: "2002",
       roleName: "Bruce Wayne / Batman",
       roleDescription: "A billionaire who fights crime as the masked vigilante Batman.",
     }
@@ -102,20 +114,20 @@ export const movieCasts: MovieCast[] = [
 
 export const awards: Award[] = [
   {
-    id: 1000,
-    body: "Academy Awards",
+    pk: "w1000",
+    sk: "Academy Awards",
     category: "Best Picture",
     year: 1995
   },
   {
-    id: 2001,
-    body: "Golden Globe Awards",
+    pk: "w2001",
+    sk: "Golden Globe Awards",
     category: "Best Actor in a Motion Picture – Drama",
     year: 1973
   },
   {
-    id: 2002,
-    body: "BAFTA Awards",
+    pk: "w2002",
+    sk: "BAFTA Awards",
     category: "Best Supporting Actor",
     year: 2009
   }

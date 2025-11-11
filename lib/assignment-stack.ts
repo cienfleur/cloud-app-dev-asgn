@@ -6,7 +6,7 @@ import * as custom from "aws-cdk-lib/custom-resources";
 import * as apig from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
 import { generateBatch } from "../shared/util";
-import { movies, movieCasts } from "../seed/movies";
+import { movies, actors, movieCasts, awards } from "../seed/movies";
 
 // import * as sqs from 'aws-cdk-lib/aws-sqs';
 
@@ -14,28 +14,14 @@ export class AssignmentStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Tables 
+    // Tables (single table design)
     const moviesTable = new dynamodb.Table(this, "MoviesTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "id", type: dynamodb.AttributeType.NUMBER },
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      tableName: "Movies",
+      partitionKey: { name: "pk", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "sk", type: dynamodb.AttributeType.STRING },
+      tableName: "MoviesTable",
+      removalPolicy: cdk.RemovalPolicy.DESTROY, // NOT recommended for production code
     });
-
-      const movieCastsTable = new dynamodb.Table(this, "MovieCastTable", {
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
-      sortKey: { name: "actorName", type: dynamodb.AttributeType.STRING },
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      tableName: "MovieCast",
- });
-
-    movieCastsTable.addLocalSecondaryIndex({
-      indexName: "roleIx",
-      sortKey: { name: "roleName", type: dynamodb.AttributeType.STRING },
- });
-
-
     
     // Functions 
     const getMovieByIdFn = new lambdanode.NodejsFunction(
@@ -70,22 +56,28 @@ export class AssignmentStack extends cdk.Stack {
         }
         );
         
-            new custom.AwsCustomResource(this, "moviesddbInitData", {
-      onCreate: {
-        service: "DynamoDB",
-        action: "batchWriteItem",
-        parameters: {
-          RequestItems: {
-            [moviesTable.tableName]: generateBatch(movies),
-            [movieCastsTable.tableName]: generateBatch(movieCasts),  // Added
- },
- },
-        physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"), //.of(Date.now().toString()),
- },
-      policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [moviesTable.tableArn, movieCastsTable.tableArn],  // Includes movie cast
- }),
- });
+        // ...existing code...
+new custom.AwsCustomResource(this, "moviesddbInitData", {
+  onCreate: {
+    service: "DynamoDB",
+    action: "batchWriteItem",
+    parameters: {
+      RequestItems: {
+        [moviesTable.tableName]: [
+          ...generateBatch(movies),
+          ...generateBatch(actors),
+          ...generateBatch(movieCasts),
+          ...generateBatch(awards),
+        ],
+      },
+    },
+    physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"),
+  },
+  policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
+    resources: [moviesTable.tableArn],
+  }),
+});
+// ...existing code...
 
 
 
@@ -123,7 +115,7 @@ export class AssignmentStack extends cdk.Stack {
             timeout: cdk.Duration.seconds(10),
             memorySize: 128,
             environment: {
-              TABLE_NAME: movieCastsTable.tableName,
+              TABLE_NAME: moviesTable.tableName,
               REGION: cdk.Aws.REGION,
             },
           }
@@ -134,7 +126,7 @@ export class AssignmentStack extends cdk.Stack {
         moviesTable.grantReadData(getMovieByIdFn);
         moviesTable.grantWriteData(newMovieFn);
         moviesTable.grantWriteData(deleteMovieFn);  
-        movieCastsTable.grantReadData(getMovieCastMembersFn);
+        moviesTable.grantReadData(getMovieCastMembersFn);
 
         const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
