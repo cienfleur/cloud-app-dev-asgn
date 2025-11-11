@@ -22,7 +22,7 @@ export class AssignmentStack extends cdk.Stack {
       tableName: "Movies",
     });
 
-        const movieCastsTable = new dynamodb.Table(this, "MovieCastTable", {
+      const movieCastsTable = new dynamodb.Table(this, "MovieCastTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
       sortKey: { name: "actorName", type: dynamodb.AttributeType.STRING },
@@ -86,6 +86,7 @@ export class AssignmentStack extends cdk.Stack {
         resources: [moviesTable.tableArn, movieCastsTable.tableArn],  // Includes movie cast
  }),
  });
+
 
 
         const newMovieFn = new lambdanode.NodejsFunction(this, "AddMovieFn", {
@@ -170,7 +171,7 @@ export class AssignmentStack extends cdk.Stack {
       new apig.LambdaIntegration(deleteMovieFn, { proxy: true })
     );
 
-    const movieCastEndpoint = movieEndpoint.addResource("cast");
+    const movieCastEndpoint = moviesEndpoint.addResource("actors");
     movieCastEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getMovieCastMembersFn, { proxy: true })
