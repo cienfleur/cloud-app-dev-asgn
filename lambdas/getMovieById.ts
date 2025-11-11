@@ -1,7 +1,14 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
-
+import { MovieCastMemberQueryParams } from "../shared/types";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import {
+  DynamoDBDocumentClient,
+  QueryCommand,
+  QueryCommandInput,
+  GetCommand,
+} from "@aws-sdk/lib-dynamodb";
+import Ajv from "ajv";
+import schema from "../shared/types.schema.json";
 
 const ddbDocClient = createDDbDocClient();
 
@@ -24,7 +31,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     const commandOutput = await ddbDocClient.send(
       new GetCommand({
         TableName: process.env.TABLE_NAME,
-        Key: { id: movieId },
+        Key: { pk: `m${movieId}`, sk: `xxxx` },
       })
     );
     console.log("GetCommand response: ", commandOutput);
