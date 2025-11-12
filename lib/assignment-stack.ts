@@ -55,11 +55,23 @@ export class AssignmentStack extends cdk.Stack {
           },
         }
         );
-        
-new custom.AwsCustomResource(this, "moviesddbInitData", {
-  onCreate: {
-    service: "DynamoDB",
-    action: "batchWriteItem",
+
+        const getMovieCastMemberFn = new lambdanode.NodejsFunction(this, "GetMovieCastMemberFn", {
+          architecture: lambda.Architecture.ARM_64,
+          runtime: lambda.Runtime.NODEJS_18_X,
+          entry: `${__dirname}/../lambdas/getMovieCastMember.ts`,
+          timeout: cdk.Duration.seconds(10),
+          memorySize: 128,
+          environment: {
+            TABLE_NAME: moviesTable.tableName,
+            REGION: cdk.Aws.REGION,
+          },
+        });
+
+        new custom.AwsCustomResource(this, "moviesddbInitData", {
+          onCreate: {
+            service: "DynamoDB",
+            action: "batchWriteItem",
     parameters: {
       RequestItems: {
         [moviesTable.tableName]: [
@@ -122,6 +134,7 @@ new custom.AwsCustomResource(this, "moviesddbInitData", {
         moviesTable.grantWriteData(newMovieFn);
         moviesTable.grantWriteData(deleteMovieFn);  
         moviesTable.grantReadData(getActorsFn);
+        moviesTable.grantReadData(getMovieCastMemberFn);
 
         const api = new apig.RestApi(this, "RestAPI", {
       description: "demo api",
@@ -162,6 +175,12 @@ new custom.AwsCustomResource(this, "moviesddbInitData", {
     movieCastEndpoint.addMethod(
       "GET",
       new apig.LambdaIntegration(getActorsFn, { proxy: true })
+    );
+
+    const actorEndpoint = movieCastEndpoint.addResource("{actorId}");
+    actorEndpoint.addMethod(
+      "GET",
+      new apig.LambdaIntegration(getMovieCastMemberFn, { proxy: true })
     );
 }
 

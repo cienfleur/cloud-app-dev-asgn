@@ -19,86 +19,61 @@ const ddbDocClient = createDocumentClient();
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
     console.log("[EVENT]", JSON.stringify(event));
-    const queryParams = event.queryStringParameters;
-    if (!queryParams) {
+    const parameters = event?.pathParameters;
+    const actorId = parameters?.actorId ? parseInt(parameters.actorId) : undefined;
+
+    if (!actorId) {
       return {
-        statusCode: 500,
+        statusCode: 404,
         headers: {
           "content-type": "application/json",
- },
-        body: JSON.stringify({ message: "Missing query parameters" }),
- };
- }
-    if (!isValidQueryParams(queryParams)) {
-      return {
-        statusCode: 500,
-        headers: {
-          "content-type": "application/json",
- },
-        body: JSON.stringify({
-          message: `Incorrect type. Must match Query parameters schema`,
-          schema: schema.definitions["MovieCastMemberQueryParams"],
- }),
- };
- }
-    
-    const movieId = parseInt(queryParams.movieId);
-    let commandInput: QueryCommandInput = {
-      TableName: process.env.TABLE_NAME,
- };
-    if ("roleName" in queryParams) {
-      commandInput = {
- ...commandInput,
-        IndexName: "roleIx",
-        KeyConditionExpression: "movieId = :m and begins_with(roleName, :r) ",
-        ExpressionAttributeValues: {
-          ":m": movieId,
-          ":r": queryParams.roleName,
- },
- };
- } else if ("actorName" in queryParams) {
-      commandInput = {
- ...commandInput,
-        KeyConditionExpression: "movieId = :m and begins_with(actorName, :a) ",
-        ExpressionAttributeValues: {
-          ":m": movieId,
-          ":a": queryParams.actorName,
- },
- };
- } else {
-      commandInput = {
- ...commandInput,
-        KeyConditionExpression: "movieId = :m",
-        ExpressionAttributeValues: {
-          ":m": movieId,
- },
- };
- }
-    
+        },
+        body: JSON.stringify({ Message: "Missing actor Id" }),
+      };
+    }
+
     const commandOutput = await ddbDocClient.send(
-      new QueryCommand(commandInput)
- );
-      
+      new QueryCommand({
+        TableName: process.env.TABLE_NAME,
+        KeyConditionExpression: "pk = :a",
+        ExpressionAttributeValues: {
+          ":a": `a${actorId}`,
+        },
+      })
+    );
+    console.log("QueryCommand response: ", commandOutput);
+    if (!commandOutput.Items || commandOutput.Items.length === 0) {
       return {
-        statusCode: 200,
+        statusCode: 404,
         headers: {
           "content-type": "application/json",
- },
-        body: JSON.stringify({
-          data: commandOutput.Items,
- }),
- };
- } catch (error: any) {
-      console.log(JSON.stringify(error));
-      return {
-        statusCode: 500,
-        headers: {
-          "content-type": "application/json",
- },
-        body: JSON.stringify({ error }),
- };
- }
- };
+        },
+        body: JSON.stringify({ Message: "No movies found for the given actor Id" }),
+      };
+    }
+    const body = {
+      data: commandOutput.Items,
+    };
+
+    // Return Response
+    return {
+      statusCode: 200,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(body),
+    };
+  } catch (error: any) {
+    console.log(JSON.stringify(error));
+    return {
+      statusCode: 500,
+      headers: {
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ error }),
+    };
+  }
+};
   
   function createDocumentClient() {
     const ddbClient = new DynamoDBClient({ region: process.env.REGION });
