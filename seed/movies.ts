@@ -99,16 +99,52 @@ export const movieCasts: MovieCast[] = [
       roleDescription: "A long-term inmate who becomes the best friend of Andy Dufresne.",
     },
     {
-      pk: "c1001",
+      pk: "c1000",
       sk: "2001",
+      roleName: "Andy Dufresne",
+      roleDescription: "A banker who is sentenced to life in Shawshank State Penitentiary for the murder of his wife and her lover.",
+    },
+    {
+      pk: "c1000",
+      sk: "2002",
+      roleName: "Captain Hadley",
+      roleDescription: "The captain of the prison guards at Shawshank State Penitentiary.",
+    },
+    {
+      pk: "c1001",
+      sk: "2100",
       roleName: "Vito Corleone",
       roleDescription: "The aging patriarch of the Corleone crime family.",
     },
     {
+      pk: "c1001",
+      sk: "2101",
+      roleName: "Michael Corleone",
+      roleDescription: "The youngest son of Vito Corleone, who becomes the new Godfather."
+    },
+    {
+      pk: "c1001",
+      sk: "2102",
+      roleName: "Sonny Corleone",
+      roleDescription: "The hot-headed eldest son of Vito Corleone."
+    },
+    {
       pk: "c1002",
-      sk: "2002",
+      sk: "2200",
       roleName: "Bruce Wayne / Batman",
       roleDescription: "A billionaire who fights crime as the masked vigilante Batman.",
+    },
+    {
+      pk: "c1002",
+      sk: "2201",
+      roleName: "Joker",
+      roleDescription: "The arch-nemesis of Batman, known for his chaotic and sadistic nature.",
+    },
+    {
+      pk: "c1002",
+      sk: "2202",
+      roleName: "Alfred Pennyworth",  
+      roleDescription: "The loyal butler and confidant of Bruce Wayne."
     }
 ];
 
