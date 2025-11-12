@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { MovieCastMemberQueryParams } from "../shared/types";
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBClient, BatchGetItemCommand } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
   QueryCommand,
@@ -9,6 +9,7 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import Ajv from "ajv";
 import schema from "../shared/types.schema.json";
+import { and } from "ajv/dist/compile/codegen";
 
 const ddbDocClient = createDDbDocClient();
 
@@ -29,16 +30,25 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     }
 
     const commandOutput = await ddbDocClient.send(
-      new QueryCommand({
-        TableName: process.env.TABLE_NAME,
-        KeyConditionExpression: "pk = :m and begins_with(sk, :a) ",
-        ExpressionAttributeValues: {
-          ":m": `c${movieId}`,
-          ":a": `2`,
-        },
+        new QueryCommand({
+            TableName: process.env.TABLE_NAME,
+            KeyConditionExpression: "pk = :m and begins_with(sk, :c)",
+            ExpressionAttributeValues: {
+              ":m": `c${movieId}`,
+              ":c": "2",
+            },
       })
     );
     console.log("QueryCommand response: ", commandOutput);
+    if (!commandOutput.Items || commandOutput.Items.length === 0) {
+      return {
+        statusCode: 404,
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ Message: "No actors found for the given movie Id" }),
+      };
+    }
     const body = {
       data: commandOutput.Items,
     };
@@ -58,7 +68,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       headers: {
         "content-type": "application/json",
       },
-      body: JSON.stringify({ error }),
+      body: JSON.stringify({ Message: "Internal Server Error" }),
     };
   }
 };
