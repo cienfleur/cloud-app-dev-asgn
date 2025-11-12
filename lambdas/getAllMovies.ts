@@ -3,7 +3,7 @@ import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 import { DynamoDBClient, QueryCommand } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
-const ddbDocClient = createDDbDocClient();
+const ddbDocClient = createDocumentClient();
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
@@ -52,7 +52,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   }
 };
 
-function createDDbDocClient() {
+function createDocumentClient() {
   const ddbClient = new DynamoDBClient({ region: process.env.REGION });
   const marshallOptions = {
     convertEmptyValues: true,

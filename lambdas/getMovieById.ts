@@ -10,7 +10,7 @@ import {
 import Ajv from "ajv";
 import schema from "../shared/types.schema.json";
 
-const ddbDocClient = createDDbDocClient();
+const ddbDocClient = createDocumentClient();
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
@@ -68,7 +68,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   }
 };
 
-function createDDbDocClient() {
+function createDocumentClient() {
   const ddbClient = new DynamoDBClient({ region: process.env.REGION });
   const marshallOptions = {
     convertEmptyValues: true,
