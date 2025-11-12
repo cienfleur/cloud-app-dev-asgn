@@ -9,6 +9,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
     const queryParams = event.queryStringParameters || {};
     const movieId = queryParams.movieId;
     const actorId = queryParams.actorId;
+    const awardBody = queryParams.awardBody;
 
     if (!movieId && !actorId) {
       return {
@@ -17,7 +18,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       };
     }
 
-    // Build filter expressions dynamically
     let filterExpressions: string[] = [];
     let expressionAttributeValues: Record<string, any> = {};
 
@@ -31,7 +31,19 @@ export const handler: APIGatewayProxyHandlerV2 = async (event) => {
       expressionAttributeValues[":actorPK"] = `w${actorId}`;
     }
 
-    const filterExpression = filterExpressions.join(" OR ");
+    if (awardBody) {
+      filterExpressions.push("begins_with(sk, :awardBody)");
+      expressionAttributeValues[":awardBody"] = awardBody;
+    }
+
+    let filterExpression = "";
+    if (movieId && actorId && awardBody) {
+      filterExpression = `(begins_with(pk, :moviePK) OR begins_with(pk, :actorPK)) AND begins_with(sk, :awardBody)`;
+    } else if (awardBody) {
+      filterExpression = filterExpressions.join(" AND ");
+    } else {
+      filterExpression = filterExpressions.join(" OR ");
+    }
 
     // Scan command
     const command = new ScanCommand({
