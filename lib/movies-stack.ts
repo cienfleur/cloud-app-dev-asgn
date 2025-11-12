@@ -54,6 +54,33 @@ export class CognitoStack extends cdk.Stack {
       },
     });
 
+    const apiKey = appApi.addApiKey("AppApiKey", {
+  apiKeyName: "AppApiKey",
+  description: "admin api key",
+});
+
+const usagePlan = appApi.addUsagePlan("AppApiUsagePlan", {
+  name: "AppApiUsagePlan",
+  throttle: {
+    rateLimit: 10,
+    burstLimit: 2,
+  },
+  quota: {
+    limit: 10000,
+    period: apig.Period.MONTH,
+  },
+});
+
+usagePlan.addApiKey(apiKey);
+usagePlan.addApiStage({
+  stage: appApi.deploymentStage,
+});
+
+new cdk.CfnOutput(this, "AppApiKeyId", {
+  value: apiKey.keyId,
+  description: "Admin API Key id",
+});
+
     const appCommonFnProps = {
       architecture: lambda.Architecture.ARM_64,
       timeout: cdk.Duration.seconds(10),
@@ -231,7 +258,10 @@ export class CognitoStack extends cdk.Stack {
         );
         moviesEndpoint.addMethod(
               "POST",
-              new apig.LambdaIntegration(newMovieFn, { proxy: true })
+              new apig.LambdaIntegration(newMovieFn, { proxy: true }),
+              {
+                apiKeyRequired: true,
+              }
             );
         
             const movieEndpoint = moviesEndpoint.addResource("{movieId}");
@@ -246,7 +276,10 @@ export class CognitoStack extends cdk.Stack {
         
             movieEndpoint.addMethod(
               "DELETE",
-              new apig.LambdaIntegration(deleteMovieFn, { proxy: true })
+              new apig.LambdaIntegration(deleteMovieFn, { proxy: true }),
+              {
+                apiKeyRequired: true,
+              }
             );
         
             const movieCastEndpoint = movieEndpoint.addResource("actors");
