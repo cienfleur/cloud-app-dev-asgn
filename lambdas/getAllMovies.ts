@@ -5,10 +5,10 @@ import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
 
 const ddbDocClient = createDocumentClient();
 
+
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
-    // Print Event
-    console.log("Event: ", event);
+    console.log("[EVENT]", JSON.stringify(event));
 
     const commandOutput = await ddbDocClient.send(
       new ScanCommand({
