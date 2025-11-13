@@ -3,35 +3,22 @@
 __Name:__ Sebastien Jazmin
 
 ### Links.
-__Demo:__ A link to your YouTube video demonstration.
+__Demo:__ [Youtube demonstration can be found here.](https://youtu.be/cUO9TEW8X80)
 
 ### Screenshots.
 
-[A screenshot of the App Web API from the management console, e.g.
+#### App API
+<img width="1800" height="861" alt="ishare-1762991549-firefox" src="https://github.com/user-attachments/assets/a3d19f66-970e-492b-82c0-37fbd08b51b3" />
 
-![][api]
 
-The Auth API is not required as its code was provided in the labs.
+#### DynamoDB seeding
+<img width="1790" height="960" alt="ishare-1762991637-firefox" src="https://github.com/user-attachments/assets/024bba72-b0e9-47ae-a140-6069657a4103" />
 
-]
-
-[A screenshot of your seeded table from DynamoDB, e.g.
-
-![][db]
-]
-
-[A screenshot from CloudWatch logs showing an example of User Activity logging, e.g.
-
-jbloggs /awards?movie=1234&awardBody=Academy
-]
 
 ### Design features (if required).
 
-[Briefly explain any design features of the App API in terms of custom L2 constructs, multi-stack, and lambda layers.]
+N/A
 
 ###  Extra (If relevant).
 
-[ State any other aspects of your solution that use CDK/serverless features not covered in the lectures.]
-
-[api]: ./images/api.png
-[db]: ./images/db.png
+Documentation for implementing the API key for admin authentication was found [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-api-usage-plans.html).
